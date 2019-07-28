@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+
+    <title>Avocado builds</title>
+
+    <style>
+        body {
+            margin: 0 auto;
+            max-width: 80em;
+            font-family: "Helvetica", "Arial", "sans-serif";
+            line-height: 1.25;
+            padding: 1em 1em;
+
+            color: #566b78;
+        }
+
+        code {
+            text-align:left;
+        }
+
+        h2 {
+            margin-top: 1em;
+            padding-top: 1em;
+
+            color: #333;
+        }
+
+        a {
+            color: #1fb92f;
+        }
+
+        table {
+            margin-top: 2em;
+            border-spacing: 0;
+        }
+
+        th,
+        td {
+            border-bottom: 1px solid #ddd;
+            padding-left: 12px;
+            padding-right: 12px;
+            padding-top: 4px;
+            padding-bottom: 4px;
+        }
+
+        th,
+        td:not(.message) {
+            text-align: center;
+        }
+
+        td.message {
+            max-width: 250px;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Avocado builds</h2>
+
+    Links: <a href="https://github.com/JaCzekanski/Avocado">GitHub</a> |
+    <a href="https://avocado-db.czekanski.info">Compability list</a> |
+    <a href="https://discord.gg/ATEJApR">Discord</a>
+
+    <table>
+        <tr>
+            <th>Commit</th>
+            <th>Date</th>
+            <th>Author</th>
+            <th>Message</th>
+            <th>Windows 64bit</th>
+            <th>Windows 32bit</th>
+            <th>MacOS</th>
+            <th>Linux</th>
+            <th>Android</th>
+            <th>Web</th>
+        </tr>
+        {{$baseUrl := .BaseURL}}
+        {{range .Commits}}
+        {{$url := printf "%s/%s/" $baseUrl .Revision }}
+        <tr>
+            <td><a href="https://github.com/JaCzekanski/Avocado/commit/{{.Revision}}">{{.Revision}}</a></td>
+            <td>{{.Date}}</td>
+            <td>{{.Author}}</td>
+            <td class="message"><code>{{.Message}}</code></td>
+            <td>{{ with $name := index .Artifacts "windows64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link </a>{{ end }}{{ end }}</td>
+            <td>{{ with $name := index .Artifacts "windows32" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link </a>{{ end }}{{ end }}</td>
+            <td>{{ with $name := index .Artifacts "macos" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link </a>{{ end }}{{ end }}</td>
+            <td>{{ with $name := index .Artifacts "linux64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link </a>{{ end }}{{ end }}</td>
+            <td>{{ with $name := index .Artifacts "android" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link </a>{{ end }}{{ end }}</td>
+            <td>{{ with $name := index .Artifacts "web" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link </a>{{ end }}{{ end }}</td>
+        </tr>
+        {{end}}
+    </table>
+
+    <small>Generated at {{ .UpdatedAt }} in {{ .GenerationTime }}</small>
+</body>
+
+</html>
