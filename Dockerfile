@@ -1,7 +1,7 @@
 FROM golang:1.12-alpine as build
 WORKDIR /app
-COPY . .
 RUN apk add --no-cache git
+COPY . .
 RUN CGO_ENABLED=0 go build .
 
 

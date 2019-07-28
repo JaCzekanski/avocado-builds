@@ -189,7 +189,7 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 func artifactUpload(w http.ResponseWriter, r *http.Request) {
 	msgs := []string{}
 
-	date, err := time.Parse("2006-01-02T15:04:05.000Z", r.Header.Get("X-Commit-Date"))
+	date, err := time.Parse("2006-01-02T15:04:05-07:00", r.Header.Get("X-Commit-Date"))
 	if err != nil {
 		msgs = append(msgs, "Missing X-Commit-Date header or invalid date format")
 	}
