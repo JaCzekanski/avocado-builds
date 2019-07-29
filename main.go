@@ -27,6 +27,7 @@ const (
 	badgeURL      = "https://img.shields.io/badge"
 )
 
+var badgeCache = make(map[string][]byte)
 var apiToken string
 
 type errorResponse struct {
@@ -286,7 +287,7 @@ func getLatestArtifactForPlatform(w http.ResponseWriter, r *http.Request) {
 	http.NotFound(w, r)
 }
 
-func getBadge(status bool) string {
+func getBadge(status bool) ([]byte, error) {
 	title := "build"
 	var msg string
 	var color string
@@ -297,9 +298,28 @@ func getBadge(status bool) string {
 		msg = "failed"
 		color = "red"
 	}
-	return fmt.Sprintf("%s/%s-%s-%s", badgeURL, title, msg, color)
+	url := fmt.Sprintf("%s/%s-%s-%s", badgeURL, title, msg, color)
+
+	if image, ok := badgeCache[url]; ok {
+		return image, nil
+	}
+
+	r, err := http.Get(url)
+	if err != nil {
+		return nil, err
+	}
+
+	image, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	badgeCache[url] = image
+
+	return image, nil
 }
 func getBuildStatus(w http.ResponseWriter, r *http.Request) {
+	w.Header().Add("Cache-Control", "no-cache")
 	// TODO: Cache
 	listing := generateListing()
 
@@ -315,7 +335,15 @@ func getBuildStatus(w http.ResponseWriter, r *http.Request) {
 	// TODO: Status - pending
 	_, ok := latestCommit.Artifacts[platform]
 
-	http.Redirect(w, r, getBadge(ok), http.StatusTemporaryRedirect)
+	badge, err := getBadge(ok)
+	if err != nil {
+		log.Print(err)
+		http.Error(w, "Cannot download badge", http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "image/svg+xml")
+	w.Write(badge)
 }
 
 func main() {
