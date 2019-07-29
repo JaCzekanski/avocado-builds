@@ -20,11 +20,11 @@ import (
 )
 
 const (
-	baseURL       = "/data"
+	baseURL       = "/d"
 	dataDir       = "data"
 	metadataFile  = ".metadata.json"
 	maxUploadSize = 100 * 1024 * 1024
-	badgeURL      = "https://img.shields.io/badge/"
+	badgeURL      = "https://img.shields.io/badge"
 )
 
 var apiToken string
@@ -38,11 +38,11 @@ type healthResponse struct {
 }
 
 type Metadata struct {
-	Revision  string    `json:"revision"`
-	Author    string    `json:"author"`
-	Message   string    `json:"message"`
-	Date      time.Time `json:"date"`
-	Artifacts map[string]string
+	Revision  string            `json:"revision"`
+	Author    string            `json:"author"`
+	Message   string            `json:"message"`
+	Date      time.Time         `json:"date"`
+	Artifacts map[string]string `json:"-"`
 }
 
 type BuildsData struct {
