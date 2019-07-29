@@ -166,7 +166,7 @@ func generateListing() []Metadata {
 	}
 
 	sort.Slice(listing, func(i, j int) bool {
-		return listing[i].Date.Before(listing[j].Date)
+		return listing[i].Date.After(listing[j].Date)
 	})
 
 	return listing
@@ -271,16 +271,14 @@ func artifactUpload(w http.ResponseWriter, r *http.Request) {
 
 func getLatestArtifactForPlatform(w http.ResponseWriter, r *http.Request) {
 	// TODO: Cache
+	// TODO: Filter by branch
 	listing := generateListing()
 
 	params := mux.Vars(r)
 	platform := params["platform"]
 
 	for _, commit := range listing {
-		log.Printf("commit %s", commit)
 		if artifact, ok := commit.Artifacts[platform]; ok {
-			log.Printf("Artifact %s", artifact)
-
 			// TODO: ugly way
 			http.Redirect(w, r, fmt.Sprintf("https://%s%s/%s/%s", r.Host, baseURL, commit.Revision, artifact), http.StatusTemporaryRedirect)
 		}

@@ -84,8 +84,8 @@
         {{$baseUrl := .BaseURL}}
         {{range .Commits}}
         {{$url := printf "%s/%s/" $baseUrl .Revision }}
-        <tr>
-            <td title="{{.Branch}}"><a href="https://github.com/JaCzekanski/Avocado/commit/{{.Revision}}">{{.Revision}}</a></td>
+        <tr title="{{.Branch}}">
+            <td><a href="https://github.com/JaCzekanski/Avocado/commit/{{.Revision}}">{{.Revision}}</a></td>
             <td>{{.Date.Format "2006-01-02 15:04:05"}}</td>
             <td>{{.Author}}</td>
             <td class="message"><code>{{.Message}}</code></td>
