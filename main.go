@@ -223,7 +223,7 @@ func artifactUpload(w http.ResponseWriter, r *http.Request) {
 
 	path := filepath.Join(dataDir, metadata.Revision)
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		err = os.MkdirAll(path, 0744)
+		err = os.MkdirAll(path, 0755)
 		if err != nil {
 			httpError(w, "Cannot save file")
 			log.Fatal(err)
