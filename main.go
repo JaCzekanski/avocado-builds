@@ -39,6 +39,7 @@ type healthResponse struct {
 
 type Metadata struct {
 	Revision  string            `json:"revision"`
+	Branch    string            `json:"branch"`
 	Author    string            `json:"author"`
 	Message   string            `json:"message"`
 	Date      time.Time         `json:"date"`
@@ -195,9 +196,10 @@ func artifactUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	metadata := Metadata{
 		Revision: r.Header.Get("X-Commit-Revision"),
+		Branch:   r.Header.Get("X-Commit-Branch"),
 		Author:   r.Header.Get("X-Commit-Author"),
-		Date:     date,
 		Message:  r.Header.Get("X-Commit-Message"),
+		Date:     date,
 	}
 
 	// TODO: More validation, strip invalid ?
@@ -209,6 +211,9 @@ func artifactUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	if len(metadata.Message) == 0 {
 		msgs = append(msgs, "Missing X-Commit-Message header")
+	}
+	if len(metadata.Branch) == 0 {
+		msgs = append(msgs, "Missing X-Commit-Branch header")
 	}
 	if len(msgs) != 0 {
 		httpErrors(w, msgs)
@@ -241,6 +246,7 @@ func artifactUpload(w http.ResponseWriter, r *http.Request) {
 	raw, err := json.MarshalIndent(metadata, "", "  ")
 	fMeta.Write(raw)
 
+	// TODO: Handle file array
 	src, header, err := r.FormFile("file")
 	if err != nil {
 		httpError(w, err.Error())
