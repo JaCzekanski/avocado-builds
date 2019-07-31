@@ -54,22 +54,30 @@ type BuildsData struct {
 	GenerationTime time.Duration
 }
 
+func writeJson(w http.ResponseWriter, v interface{}) {
+	if err := json.NewEncoder(w).Encode(v); err != nil {
+		log.Fatal(err)
+	}
+}
+
 func httpErrors(w http.ResponseWriter, msgs []string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusBadRequest)
-	json.NewEncoder(w).Encode(errorResponse{
+	writeJson(w, errorResponse{
 		Error: msgs,
 	})
+	log.Print(msgs)
 }
 
 func httpError(w http.ResponseWriter, msg string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusBadRequest)
-	json.NewEncoder(w).Encode(errorResponse{
+	writeJson(w, errorResponse{
 		Error: []string{
 			msg,
 		},
 	})
+	log.Print(msg)
 }
 
 func checkAuthorization(h http.HandlerFunc) http.HandlerFunc {
@@ -79,7 +87,7 @@ func checkAuthorization(h http.HandlerFunc) http.HandlerFunc {
 		if token != apiToken {
 			w.Header().Set("Content-Type", "application/json")
 			w.WriteHeader(http.StatusUnauthorized)
-			json.NewEncoder(w).Encode(errorResponse{
+			writeJson(w, errorResponse{
 				Error: []string{"Invalid authentication token"},
 			})
 			return
@@ -95,7 +103,7 @@ func authorized(h http.HandlerFunc) http.HandlerFunc {
 
 func healthCheck(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(healthResponse{
+	writeJson(w, healthResponse{
 		Status: "ok",
 	})
 }
@@ -245,7 +253,9 @@ func artifactUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer fMeta.Close()
 	raw, err := json.MarshalIndent(metadata, "", "  ")
-	fMeta.Write(raw)
+	if _, err = fMeta.Write(raw); err != nil {
+		log.Fatal(err)
+	}
 
 	// TODO: Handle file array
 	src, header, err := r.FormFile("file")
@@ -263,7 +273,9 @@ func artifactUpload(w http.ResponseWriter, r *http.Request) {
 	}
 	defer dst.Close()
 
-	io.Copy(dst, src)
+	if _, err = io.Copy(dst, src); err != nil {
+		log.Fatal(err)
+	}
 
 	log.Printf("Uploading %s (rev: %s)", header.Filename, metadata.Revision)
 
@@ -374,5 +386,5 @@ func main() {
 	r.HandleFunc("/status/{platform}", getBuildStatus).Methods("GET")
 
 	log.Printf("Running server at port %s", port)
-	http.ListenAndServe(fmt.Sprintf(":%s", port), handlers.LoggingHandler(os.Stdout, handlers.ProxyHeaders(r)))
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), handlers.CombinedLoggingHandler(os.Stdout, handlers.ProxyHeaders(r))))
 }
