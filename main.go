@@ -292,8 +292,8 @@ func getLatestArtifactForPlatform(w http.ResponseWriter, r *http.Request) {
 
 	for _, commit := range listing {
 		if artifact, ok := commit.Artifacts[platform]; ok {
-			// TODO: ugly way
-			http.Redirect(w, r, fmt.Sprintf("https://%s%s/%s/%s", r.Host, baseURL, commit.Revision, artifact), http.StatusTemporaryRedirect)
+			http.Redirect(w, r, fmt.Sprintf("%s/%s/%s", baseURL, commit.Revision, artifact), http.StatusTemporaryRedirect)
+			return
 		}
 	}
 	http.NotFound(w, r)
