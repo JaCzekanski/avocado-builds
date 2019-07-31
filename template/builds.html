@@ -52,7 +52,7 @@
             max-width: 250px;
         }
 
-        tr:hover {
+        tbody > tr:hover {
             background-color: #f5f5f5;
         }
 
@@ -60,6 +60,7 @@
             body {
                 padding: 0.5em;
             }
+            
             h2 {
                 margin-top: 0em;
             }
@@ -122,7 +123,6 @@
                 <th>MacOS</th>
                 <th>Linux</th>
                 <th>Android</th>
-                <th>Web</th>
             </tr>
         </thead>
         {{$baseUrl := .BaseURL}}
@@ -139,7 +139,6 @@
                 <td label="MacOS">{{ with $name := index .Artifacts "macos" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
                 <td label="Linux">{{ with $name := index .Artifacts "linux64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
                 <td label="Android">{{ with $name := index .Artifacts "android" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
-                <td label="Web">{{ with $name := index .Artifacts "web" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
             </tr>
         </tbody>
         {{end}}
