@@ -125,23 +125,23 @@
                 <th>Android</th>
             </tr>
         </thead>
-        {{$baseUrl := .BaseURL}}
-        {{range .Commits}}
-        {{$url := printf "%s/%s/" $baseUrl .Revision }}
         <tbody>
-            <tr title="{{.Branch}}">
-                <td label="Commit"><a href="https://github.com/JaCzekanski/Avocado/commit/{{.Revision}}">{{.Revision}}</a></td>
-                <td label="Date">{{.Date.Format "2006-01-02 15:04:05"}}</td>
-                <td label="Author">{{.Author}}</td>
-                <td label="Message" class="message"><code>{{.Message}}</code></td>
-                <td label="Windows64">{{ with $name := index .Artifacts "windows64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
-                <td label="Windows32">{{ with $name := index .Artifacts "windows32" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
-                <td label="MacOS">{{ with $name := index .Artifacts "macos" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
-                <td label="Linux">{{ with $name := index .Artifacts "linux64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
-                <td label="Android">{{ with $name := index .Artifacts "android" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
-            </tr>
+            {{$baseUrl := .BaseURL}}
+            {{range .Commits}}
+            {{$url := printf "%s/%s/" $baseUrl .Revision }}
+                <tr title="{{.Branch}}">
+                    <td label="Commit"><a href="https://github.com/JaCzekanski/Avocado/commit/{{.Revision}}">{{.Revision}}</a></td>
+                    <td label="Date">{{.Date.Format "2006-01-02 15:04:05"}}</td>
+                    <td label="Author">{{.Author}}</td>
+                    <td label="Message" class="message"><code>{{.Message}}</code></td>
+                    <td label="Windows64">{{ with $name := index .Artifacts "windows64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
+                    <td label="Windows32">{{ with $name := index .Artifacts "windows32" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
+                    <td label="MacOS">{{ with $name := index .Artifacts "macos" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
+                    <td label="Linux">{{ with $name := index .Artifacts "linux64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
+                    <td label="Android">{{ with $name := index .Artifacts "android" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
+                </tr>
+            {{end}}
         </tbody>
-        {{end}}
     </table>
 
     <small>Generated at {{ .UpdatedAt }} in {{ .GenerationTime }}</small>
