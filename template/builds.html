@@ -144,7 +144,7 @@
         </tbody>
     </table>
 
-    <small>Generated at {{ .UpdatedAt }} in {{ .GenerationTime }}</small>
+    <small>Generated at {{ .UpdatedAt.Format "2006-01-02 15:04:05 MST"}} in {{ .GenerationTime }}</small>
 </body>
 
 </html>

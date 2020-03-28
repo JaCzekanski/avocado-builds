@@ -25,6 +25,7 @@ const (
 	metadataFile  = ".metadata.json"
 	maxUploadSize = 100 * 1024 * 1024
 	badgeURL      = "https://img.shields.io/badge"
+	cacheValid    = 60
 )
 
 var badgeCache = make(map[string][]byte)
@@ -50,9 +51,16 @@ type Metadata struct {
 type BuildsData struct {
 	BaseURL        string
 	Commits        []Metadata
-	UpdatedAt      string
+	UpdatedAt      time.Time
 	GenerationTime time.Duration
 }
+
+type ListingCache struct {
+	Listing     []Metadata
+	GeneratedAt time.Time
+}
+
+var listingCache *ListingCache
 
 func writeJson(w http.ResponseWriter, v interface{}) {
 	if err := json.NewEncoder(w).Encode(v); err != nil {
@@ -135,7 +143,18 @@ func getPlatform(file string) string {
 	return matches[1]
 }
 
+func invalidateCache() {
+	listingCache = nil
+}
+
 func generateListing() []Metadata {
+	if listingCache != nil {
+		if time.Now().Sub(listingCache.GeneratedAt).Seconds() < cacheValid {
+			return listingCache.Listing
+		}
+		invalidateCache()
+	}
+
 	revs, err := ioutil.ReadDir(dataDir)
 	if err != nil {
 		log.Fatal(err)
@@ -178,6 +197,10 @@ func generateListing() []Metadata {
 		return listing[i].Date.After(listing[j].Date)
 	})
 
+	listingCache = &ListingCache{
+		Listing: listing,
+		GeneratedAt: time.Now(),
+	}
 	return listing
 }
 
@@ -189,7 +212,7 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 	data := BuildsData{
 		BaseURL:        baseURL,
 		Commits:        listing,
-		UpdatedAt:      time.Now().Format("2006-01-02 15:04:05 MST"),
+		UpdatedAt:      time.Now(),
 		GenerationTime: generationTime,
 	}
 	tmpl := template.Must(template.ParseFiles("template/builds.html"))
@@ -279,11 +302,12 @@ func artifactUpload(w http.ResponseWriter, r *http.Request) {
 
 	log.Printf("Uploading %s (rev: %s)", header.Filename, metadata.Revision)
 
+	invalidateCache()
+
 	w.WriteHeader(http.StatusCreated)
 }
 
 func getLatestArtifactForPlatform(w http.ResponseWriter, r *http.Request) {
-	// TODO: Cache
 	// TODO: Filter by branch
 	listing := generateListing()
 
@@ -332,7 +356,6 @@ func getBadge(status bool) ([]byte, error) {
 }
 func getBuildStatus(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Cache-Control", "no-cache")
-	// TODO: Cache
 	listing := generateListing()
 
 	params := mux.Vars(r)
