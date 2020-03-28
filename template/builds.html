@@ -43,6 +43,13 @@
             vertical-align: top;
         }
 
+        td.branch {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 125px;
+        }
+
         th,
         td:not(.message) {
             text-align: center;
@@ -51,6 +58,7 @@
         td.message {
             max-width: 250px;
         }
+
 
         tbody > tr:hover {
             background-color: #f5f5f5;
@@ -87,6 +95,10 @@
                 width: auto;
                 padding-left: 4px;
                 padding-right: 4px;
+            }
+
+            td.branch {
+                max-width: 100%;
             }
 
             td.message {
@@ -136,7 +148,7 @@
             {{$url := printf "%s/%s/" $baseUrl .Revision }}
                 <tr title="{{.Revision}}" data-revision="{{.Revision}}" onclick="window.location.hash='#{{.Revision}}'">
                     <td label="Commit"><a href="https://github.com/JaCzekanski/Avocado/commit/{{.Revision}}">{{.Revision}}</a></td>
-                    <td label="Branch"><a href="https://github.com/JaCzekanski/Avocado/tree/{{.Branch}}">{{.Branch}}</a></td>
+                    <td label="Branch" class="branch" title="{{.Branch}}"><a href="https://github.com/JaCzekanski/Avocado/tree/{{.Branch}}">{{.Branch}}</a></td>
                     <td label="Date">{{.Date.Format "2006-01-02 15:04:05"}}</td>
                     <td label="Author">{{.Author}}</td>
                     <td label="Message" class="message"><code>{{.Message}}</code></td>
