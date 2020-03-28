@@ -56,6 +56,10 @@
             background-color: #f5f5f5;
         }
 
+        tbody > tr.highlighted {
+            background-color: rgba(31, 185, 47, 0.25);
+        }
+
         @media screen and (max-width: 950px) {
             body {
                 padding: 0.5em;
@@ -108,18 +112,19 @@
     <h2>Avocado builds</h2>
 
     Links: <a href="https://github.com/JaCzekanski/Avocado">GitHub</a> |
-    <a href="https://avocado-db.czekanski.info">Compability list</a> |
+    <a href="https://avocado-db.czekanski.info">Compatibility list</a> |
     <a href="https://discord.gg/ATEJApR">Discord</a>
 
     <table>
         <thead>
             <tr>
                 <th>Commit</th>
+                <th>Branch</th>
                 <th>Date</th>
                 <th>Author</th>
                 <th>Message</th>
-                <th>Windows 64bit</th>
-                <th>Windows 32bit</th>
+                <th>Win64</th>
+                <th>Win32</th>
                 <th>MacOS</th>
                 <th>Linux</th>
                 <th>Android</th>
@@ -129,13 +134,14 @@
             {{$baseUrl := .BaseURL}}
             {{range .Commits}}
             {{$url := printf "%s/%s/" $baseUrl .Revision }}
-                <tr title="{{.Branch}}">
+                <tr title="{{.Revision}}" data-revision="{{.Revision}}" onclick="window.location.hash='#{{.Revision}}'">
                     <td label="Commit"><a href="https://github.com/JaCzekanski/Avocado/commit/{{.Revision}}">{{.Revision}}</a></td>
+                    <td label="Branch"><a href="https://github.com/JaCzekanski/Avocado/tree/{{.Branch}}">{{.Branch}}</a></td>
                     <td label="Date">{{.Date.Format "2006-01-02 15:04:05"}}</td>
                     <td label="Author">{{.Author}}</td>
                     <td label="Message" class="message"><code>{{.Message}}</code></td>
-                    <td label="Windows64">{{ with $name := index .Artifacts "windows64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
-                    <td label="Windows32">{{ with $name := index .Artifacts "windows32" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
+                    <td label="Windows 64bit">{{ with $name := index .Artifacts "windows64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
+                    <td label="Windows 32bit">{{ with $name := index .Artifacts "windows32" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
                     <td label="MacOS">{{ with $name := index .Artifacts "macos" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
                     <td label="Linux">{{ with $name := index .Artifacts "linux64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
                     <td label="Android">{{ with $name := index .Artifacts "android" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
@@ -145,6 +151,33 @@
     </table>
 
     <small>Generated at {{ .UpdatedAt.Format "2006-01-02 15:04:05 MST"}} in {{ .GenerationTime }}</small>
+
+    <script>
+    function highlightLinkedCommit() {
+        if (window.location.hash.length == 0) {
+            return;
+        }
+        const revision = window.location.hash.substr(1);
+        const regex = /^[0-9a-fA-F]+$/;
+
+        if (!regex.test(revision)) {
+            return;
+        }
+
+        const tr = document.querySelector('tr[data-revision="' + revision + '"]')
+        if (tr == null) {
+            return;
+        }
+
+        document.querySelectorAll("tr.highlighted").forEach((it) => {
+            it.classList.remove("highlighted");
+        });
+        tr.classList.add("highlighted");
+    }
+
+    window.addEventListener("hashchange", highlightLinkedCommit, false);
+    highlightLinkedCommit();
+    </script>
 </body>
 
 </html>
