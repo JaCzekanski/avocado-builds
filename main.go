@@ -134,6 +134,13 @@ func readMetadata(rev string) (Metadata, error) {
 }
 
 func getPlatform(file string) string {
+	if strings.HasSuffix(file, "x86_64.AppImage") {
+		return "linux64"
+	}
+	if strings.HasSuffix(file, "x86.AppImage") {
+		return "linux32"
+	}
+	
 	platformRegex := regexp.MustCompile("-(.*?)-")
 	matches := platformRegex.FindStringSubmatch(file)
 
