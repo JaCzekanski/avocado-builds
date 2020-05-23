@@ -315,13 +315,20 @@ func artifactUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 func getLatestArtifactForPlatform(w http.ResponseWriter, r *http.Request) {
-	// TODO: Filter by branch
 	listing := generateListing()
 
 	params := mux.Vars(r)
 	platform := params["platform"]
 
+	branch := r.URL.Query().Get("branch")
+	if branch == "" {
+		branch = "develop"
+	}
+
 	for _, commit := range listing {
+		if commit.Branch != branch {
+			continue
+		}
 		if artifact, ok := commit.Artifacts[platform]; ok {
 			http.Redirect(w, r, fmt.Sprintf("%s/%s/%s", baseURL, commit.Revision, artifact), http.StatusTemporaryRedirect)
 			return
