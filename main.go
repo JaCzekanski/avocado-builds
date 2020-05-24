@@ -374,25 +374,36 @@ func getBuildStatus(w http.ResponseWriter, r *http.Request) {
 
 	params := mux.Vars(r)
 	platform := params["platform"]
+	branch := r.URL.Query().Get("branch")
+	if branch == "" {
+		branch = "develop"
+	}
 
 	if len(listing) == 0 {
 		http.NotFound(w, r)
 		return
 	}
 
-	latestCommit := listing[0]
 	// TODO: Status - pending
-	_, ok := latestCommit.Artifacts[platform]
+	for _, commit := range listing {
+		if commit.Branch != branch {
+			continue
+		}
 
-	badge, err := getBadge(ok)
-	if err != nil {
-		log.Print(err)
-		http.Error(w, "Cannot download badge", http.StatusBadRequest)
+		_, ok := commit.Artifacts[platform];
+
+		badge, err := getBadge(ok)
+		if err != nil {
+			log.Print(err)
+			http.Error(w, "Cannot download badge", http.StatusBadRequest)
+			return
+		}
+
+		w.Header().Set("Content-Type", "image/svg+xml")
+		w.Write(badge)
 		return
 	}
-
-	w.Header().Set("Content-Type", "image/svg+xml")
-	w.Write(badge)
+	http.NotFound(w, r)
 }
 
 func main() {
