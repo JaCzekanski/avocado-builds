@@ -216,6 +216,17 @@ func getIndex(w http.ResponseWriter, r *http.Request) {
 	listing := generateListing()
 	generationTime := time.Since(start)
 
+	branch := r.URL.Query().Get("branch")
+	if branch != "" {
+		filtered := []Metadata{}
+		for _, e := range listing {
+			if e.Branch == branch {
+				filtered = append(filtered, e)
+			}
+		}
+		listing = filtered
+	}
+
 	data := BuildsData{
 		BaseURL:        baseURL,
 		Commits:        listing,
