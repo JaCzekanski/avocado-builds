@@ -31,6 +31,7 @@
         table {
             margin-top: 2em;
             border-spacing: 0;
+            width: 100%;
         }
 
         th,
@@ -133,7 +134,6 @@
                 <th>Commit</th>
                 <th>Branch</th>
                 <th>Date</th>
-                <th>Author</th>
                 <th>Message</th>
                 <th>Win64</th>
                 <th>Win32</th>
@@ -150,7 +150,6 @@
                     <td label="Commit"><a href="https://github.com/JaCzekanski/Avocado/commit/{{.Revision}}">{{.Revision}}</a></td>
                     <td label="Branch" class="branch" title="{{.Branch}}"><a href="https://github.com/JaCzekanski/Avocado/tree/{{.Branch}}">{{.Branch}}</a></td>
                     <td label="Date">{{.Date.Format "2006-01-02 15:04:05"}}</td>
-                    <td label="Author">{{.Author}}</td>
                     <td label="Message" class="message"><code>{{.Message}}</code></td>
                     <td label="Windows 64bit">{{ with $name := index .Artifacts "windows64" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
                     <td label="Windows 32bit">{{ with $name := index .Artifacts "windows32" }} {{ if $name }}<a href="{{$url}}{{$name}}">Link</a>{{ end }}{{ end }}</td>
